@@ -4,12 +4,12 @@ Get an API Key from https://coinmarketcap.com/api/
 
 run:
 
-python main.py -k <Your key obtained from coinmarketcap>
+``python main.py -k <Your key obtained from coinmarketcap>``
 
 Some optional args:
 
--w <filename.json> writes your portfolio to a specfied file, defualt is portfolio.json.
--r <filename.json> reads a portfolio from a specified file.
+``-w <filename.json>`` -->  writes your portfolio to a specfied file, defualt is portfolio.json.
+``-r <filename.json>`` -->  reads a portfolio from a specified file.
 
 # How it works
 
