@@ -9,6 +9,7 @@ run:
 Some optional args:
 
 ``-w <filename.json>`` -->  writes your portfolio to a specfied file, defualt is portfolio.json.
+
 ``-r <filename.json>`` -->  reads a portfolio from a specified file.
 
 # How it works
