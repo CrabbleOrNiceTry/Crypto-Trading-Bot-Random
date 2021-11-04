@@ -76,11 +76,8 @@ while True:
         stock = Stock(crypto_to_buy, shares, price_of_crypto)
 
         portfolio.buy_stock(stock)
-    else:
 
-        print('Not enough cash to buy')
-
-    print(portfolio)
+    portfolio.print_portfolio()
 
     time_till_next_action = random.randrange(600, 900)
     print(f"Next action occurs in {time_till_next_action} seconds.")

@@ -2,6 +2,9 @@ import random
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from requests import Request, Session
 import json
+from colorama import Fore, Style, init
+import os
+
 
 class Portfolio:
     def __init__(self, api_key, read_portfolio_from_file,cash=10_000, stocks={}, write_portfolio_to_file='portfolio.json'):
@@ -85,21 +88,52 @@ class Portfolio:
                 for result in results:
                     if result == self.stocks[stock].symbol:
                         self.stocks[stock].price = results[result]['quote']['USD']['price']
+                        self.stocks[stock].set_percent_change()
             print(self)
         except Exception as e:
             print(response.json())
             print(cryptos_to_update)
             raise e
         
+    def get_best_stock(self):
+        best_stock = None
+        for stock in self.stocks:
+            if best_stock == None:
+                best_stock = self.stocks[stock]
+            elif self.stocks[stock].percent_change > best_stock.percent_change:
+                best_stock = self.stocks[stock]
+        return best_stock
+    
+    def get_worst_stock(self):
+        worst_stock = None
+        for stock in self.stocks:
+            if worst_stock == None:
+                worst_stock = self.stocks[stock]
+            elif self.stocks[stock].percent_change < worst_stock.percent_change:
+                worst_stock = self.stocks[stock]
+        return worst_stock
     
     def __str__(self):
         return str(f"{len(self.stocks)} coins owned with a total value of {self.total_value()} with ${self.cash} cash on hand and a total portfolio value of {self.total_value() + self.cash}.")
+
+    def print_portfolio(self):
+        os.system('clear')
+        print("Cash: $", Fore.GREEN + str(self.cash) + Style.RESET_ALL)
+        print("Portfolio Value: $", Fore.GREEN + str(self.total_value() + self.cash) + Style.RESET_ALL)
+        print("Best performing stock: ", Fore.BLUE + self.get_best_stock().symbol, ", ", Fore.GREEN + str(self.get_best_stock().percent_change) + Style.RESET_ALL, "%, $", Fore.GREEN + str(self.get_best_stock().get_value()) + Style.RESET_ALL)
+        print("Best performing stock: ", Fore.RED + self.get_worst_stock().symbol, ", ", Fore.RED + str(self.get_worst_stock().percent_change) + Style.RESET_ALL, "%, $", Fore.RED + str(self.get_worst_stock().get_value()) + Style.RESET_ALL)
+        print("----------------------------------------------------------------------\n")
 
 class Stock:
     def __init__(self, symbol, shares, price):
         self.symbol = symbol
         self.shares = shares
         self.price = price
+        self.original_price = price
+        self.percent_change = 0
     
     def get_value(self,):
         return self.shares * self.price
+
+    def set_percent_change(self):
+        self.percent_change = (self.price - self.original_price) / self.original_price
