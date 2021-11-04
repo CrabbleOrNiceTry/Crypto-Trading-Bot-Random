@@ -1,4 +1,5 @@
 import random
+from typing import ChainMap
 # import import_ipynb
 from portfolio import Portfolio
 from portfolio import Stock
@@ -16,11 +17,13 @@ parser = argparse.ArgumentParser()
 if len(sys.argv) > 1:
     parser.add_argument('-w', '--write', help='Where to write portfolio, default=portfolio.json. Usage: -w <filename.json>', default='portfolio.json')
     parser.add_argument('-r', '--read', help='Read already created portfolio. Usage -r <filename.json> ', default=None)
-    parser.add_argument('-k', '--key', help='API key', default='YOUR_API_KEY')
+    parser.add_argument('-k', '--key', required=True, help='API key', default='YOUR_API_KEY')
+    parser.add_argument('-c', '--chance', help='Chance of selling a holding on each action. Usage: -c <0 < integer passed in < 100', default=50, type=int)
     args = parser.parse_args()
     portfolio_file = args.write
     read_portfolio_file = args.read
     key = args.key
+    chance = args.chance
 
 
 api_key = key
@@ -55,7 +58,7 @@ portfolio = Portfolio(api_key, read_portfolio_from_file=read_portfolio_file if r
 # get random crypto from crpytos dictionary
 
 while True:
-    if random.randrange(0,15) == 0 and len(portfolio.stocks) > 0:
+    if random.randrange(0, 100) < chance and len(portfolio.stocks) > 0:
 
         portfolio.sell_random_stock()
 
