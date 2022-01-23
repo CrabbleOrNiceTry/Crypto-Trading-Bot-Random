@@ -20,13 +20,10 @@ Once you have one holding it will roll the die to randomly select a holding to s
 
 # Why make something so dumb?
 
-I saw an article about a hampster that based off of certain movements it made would sell or buy a stock, so completely random. 
+I saw an article about a hampster that, based off of certain movements, it made would sell or buy a stock, a relatively random method of buying/selling stock/crpyto. 
 This, apparently, turned out to be quite effective, if I may note, their was a similar thing done with apes. So I created a simple portfolio
 and crypto buying emulator to see how it would perform. This method probably only works in bullish market conditions
 and overall holding stocks/cryptos long term is a safer and more suitable method for real life. 
-
-If this turns out to work (some tweeking will definitely be required) I'll make something that interacts with Kraken or Binance
-to actually trade stuff. I'll throw in like $50 or something and just see what happens. 
 
 # Issues?
 
