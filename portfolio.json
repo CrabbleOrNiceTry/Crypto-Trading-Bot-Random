@@ -1,0 +1,45 @@
+{
+    "ARK": {
+        "symbol": "ARK",
+        "shares": 248.6303799023082,
+        "price": 0.8125475578864146,
+        "original_price": 1.94516353612144,
+        "percent_change": -58.22728820494988
+    },
+    "ONT": {
+        "symbol": "ONT",
+        "shares": 591.137773658972,
+        "price": 0.4573589481833137,
+        "original_price": 1.02583856757099,
+        "percent_change": -55.41608956404696
+    },
+    "CSPR": {
+        "symbol": "CSPR",
+        "shares": 1029.9562811183796,
+        "price": 0.0816190200595489,
+        "original_price": 0.12703603442331,
+        "percent_change": -35.75128472006796
+    },
+    "VET": {
+        "symbol": "VET",
+        "shares": 6766.865023288158,
+        "price": 0.051194420173047865,
+        "original_price": 0.13817762714554,
+        "percent_change": -62.950282740688756
+    },
+    "DFI": {
+        "symbol": "DFI",
+        "shares": 223.1841741450955,
+        "price": 2.4342120430205867,
+        "original_price": 2.27531389449186,
+        "percent_change": 6.983570438935556
+    },
+    "DOGE": {
+        "symbol": "DOGE",
+        "shares": 372.2790205951142,
+        "price": 0.13281917678361763,
+        "original_price": 0.27175752391169,
+        "percent_change": -51.125851136773534
+    },
+    "cash": 6985.700999299976
+}
