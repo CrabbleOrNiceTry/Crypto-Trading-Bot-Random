@@ -25,9 +25,15 @@ if len(sys.argv) > 1:
         '-c', '--chance', help='Chance of selling a holding on each action. Usage: -c <0 < integer passed in < 100', default=50, type=int)
     parser.add_argument(
         '-t', '--trending', help='Select coins to buy from a list of trending rather than top 100', default=False, type=bool)
+    parser.add_argument(
+        '-s', '--selective', help='Select coins to buy from a list of top 100', default=False, type=bool)
+    parser.add_argument(
+        '-m', '--money', help='How much money to invest in the portfolio', default=1000, type=float)
     args = parser.parse_args()
     portfolio_file = args.write
     read_portfolio_file = args.read
+    money = args.money
+    selective = args.selective
     key = args.key
     chance = args.chance
     trending = args.trending
@@ -63,16 +69,40 @@ def get_top_100_cryptos():
 
 
 portfolio = Portfolio(api_key, trending=trending,
-                      read_portfolio_from_file=read_portfolio_file, write_portfolio_to_file=portfolio_file)
+                      read_portfolio_from_file=read_portfolio_file, write_portfolio_to_file=portfolio_file, cash=money)
 
-# # get random crypto from crpytos dictionary
-# raw_input = input('Enter a crypto symbol or "n" to stop: ')
-# while raw_input != 'n':
-#     # Look up crypto
-#     try:
+# get random crypto from crpytos dictionary
+symbol = input('Enter a crypto symbol or "n" to stop: ')
+while symbol != 'n' and symbol != 'N' and selective:
+    # Look up crypto
+    try:
+        if symbol in list(portfolio.get_stocks().keys()):
+            cash_to_spend = float(
+                input("Enter cash to spend on this crypto: "))
+            shares = cash_to_spend / portfolio.get_stocks()[symbol]
+            stock = Stock(symbol, shares, portfolio.get_stocks()[symbol])
+            portfolio.buy_stock(stock)
+            portfolio.print_portfolio()
+            symbol = input('Enter a crypto symbol or "n" to stop: ')
+        else:
+            raise ValueError
+    except ValueError as e:
+        results = portfolio.update_stock(symbol)
+        for result in results:
+            if result == symbol:
+                price = results[result]['quote']['USD']['price']
+                cash_to_spend = float(
+                    input("Enter cash to spend on this crypto: "))
+                shares = cash_to_spend / price
+                stock = Stock(symbol, shares, price)
+                portfolio.buy_stock(stock)
+                portfolio.print_portfolio()
+                symbol = input('Enter a crypto symbol or "n" to stop: ')
+                break
 
+portfolio.print_portfolio()
 
-while True:
+while True and not selective:
     if random.randrange(0, 100) < chance and len(portfolio.stocks) > 0:
 
         portfolio.sell_random_stock()

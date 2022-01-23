@@ -15,7 +15,7 @@ class Portfolio:
         self.portfolio_change_one_hour_time = time.time() + 3600
         self.portfolio_change_one_day_time = time.time() + 86400
         self.url = 'https://pro-api.coinmarketcap.com'
-        self.api_key = '06b26ee1-737d-48ad-bd50-b9a770e1fc6e'
+        self.api_key = api_key
         self.headers = {
             'Accepts': 'application/json',
             'X-CMC_PRO_API_KEY': self.api_key,
@@ -136,7 +136,7 @@ class Portfolio:
 
     def update_stock(self, symbol):
         '''
-        updates the price of a given stock(s).
+        returns a list of stocks that match the given symbol(s).
         '''
         parameters = {
             'symbol': symbol,
@@ -166,25 +166,11 @@ class Portfolio:
         cryptos_to_update = cryptos_to_update[:-1]
         print(cryptos_to_update)
         results = self.update_stock(cryptos_to_update)
-        # response = None
-        # parameters = {
-        #     'symbol': cryptos_to_update,
-        #     'convert': 'USD'
-        # }
-        # try:
-        #     response = self.session.get(
-        #         self.url + '/v1/cryptocurrency/quotes/latest', params=parameters)
-        #     results = response.json()['data']
         for stock in self.stocks:
             for result in results:
                 if result == self.stocks[stock].symbol:
                     self.stocks[stock].price = results[result]['quote']['USD']['price']
                     self.stocks[stock].set_percent_change()
-        #     print(self)
-        # except Exception as e:
-        #     print(response.json())
-        #     print(cryptos_to_update)
-        #     raise e
 
     def get_best_stock(self):
         '''
