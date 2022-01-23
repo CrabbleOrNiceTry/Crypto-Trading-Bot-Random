@@ -15,7 +15,7 @@ class Portfolio:
         self.portfolio_change_one_hour_time = time.time() + 3600
         self.portfolio_change_one_day_time = time.time() + 86400
         self.url = 'https://pro-api.coinmarketcap.com'
-        self.api_key = '06b26ee1-737d-48ad-bd50-b9a770e1fc6e'
+        self.api_key = ''
         self.headers = {
             'Accepts': 'application/json',
             'X-CMC_PRO_API_KEY': self.api_key,
