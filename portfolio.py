@@ -1,3 +1,4 @@
+from multiprocessing.dummy import current_process
 import random
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from requests import Request, Session
@@ -11,6 +12,7 @@ class Portfolio:
     def __init__(self, api_key, read_portfolio_from_file, cash=10_000, stocks={}, write_portfolio_to_file='portfolio.json', trending=False):
         self.stocks = stocks
         self.cash = cash
+        self.original_cash = cash
         self.trending = trending
         self.portfolio_change_one_hour_time = time.time() + 3600
         self.portfolio_change_one_day_time = time.time() + 86400
@@ -30,7 +32,7 @@ class Portfolio:
 
     def total_value(self):
         '''
-        Returns the total value of the portfolio, does not include cash on hand. 
+        Returns the total value of the portfolio, does not include cash on hand.
         '''
 
         total = 0
@@ -40,14 +42,14 @@ class Portfolio:
 
     def get_portfolio_value(self):
         '''
-        Gets the current value of the portfolio. 
+        Gets the current value of the portfolio.
         '''
         self.update_stock_info()
         return self.total_value() + self.cash
 
     def get_stocks(self):
         '''
-        Queries coinmarketcap api for the price of the top 100 cryptos and returns a list of cryptos. 
+        Queries coinmarketcap api for the price of the top 100 cryptos and returns a list of cryptos.
         If trending is set to true, it will return the top 100 trending cryptos, considering you have the right api plan, untested.
         If trending is false, returns the top 100 cryptos by market cap.
         '''
@@ -78,7 +80,7 @@ class Portfolio:
 
     def buy_stock(self, stock):
         '''
-        Buys the given stock. 
+        Buys the given stock.
         '''
 
         self.cash -= stock.get_value()
@@ -90,7 +92,7 @@ class Portfolio:
 
     def sell_random_stock(self):
         '''
-        Sells a random stock that is currently owned by first getting the new value of all stocks then selling the stock to be sold. 
+        Sells a random stock that is currently owned by first getting the new value of all stocks then selling the stock to be sold.
         '''
         self.update_stock_info()
         stock = self.stocks[random.choice(list(self.stocks.keys()))]
@@ -100,7 +102,7 @@ class Portfolio:
 
     def write_portfolio_to_file(self):
         '''
-        Writes the portfolio to a json file. 
+        Writes the portfolio to a json file.
         '''
         if time.time() >= self.portfolio_change_one_hour_time:
             # Get portfolio change one hour
@@ -154,7 +156,7 @@ class Portfolio:
 
     def update_stock_info(self):
         '''
-        Updates the price of all stocks owned in the portfolio.        
+        Updates the price of all stocks owned in the portfolio.
         '''
 
         if len(self.stocks) == 0:
@@ -174,7 +176,7 @@ class Portfolio:
 
     def get_best_stock(self):
         '''
-        From the current portfolio, get the best performing stock by percent change since it was bought. Note: not over 24hr period. 
+        From the current portfolio, get the best performing stock by percent change since it was bought. Note: not over 24hr period.
         '''
 
         best_stock = Stock("", 0, 0)
@@ -204,20 +206,38 @@ class Portfolio:
 
     def print_portfolio(self):
         '''
-        Just prints the portfolio in pretty colors and stuff. 
+        Just prints the portfolio in pretty colors and stuff.
         '''
+
+        # Sum original prices
+        sum_ = 0
+        for stock in self.stocks:
+            sum_ += self.stocks[stock].original_price * \
+                self.stocks[stock].shares
+
+        original_portfolio_value = sum_
+        current_portfolio_value = self.total_value()
+
+        # Get percent change
+        percent_change = (current_portfolio_value -
+                          original_portfolio_value) / original_portfolio_value * 100
+
         os.system('clear')
-        print("Cash: $", Fore.GREEN + str(self.cash) + Style.RESET_ALL)
-        print("Portfolio Value: $", Fore.GREEN +
-              str(self.total_value() + self.cash) + Style.RESET_ALL)
-        print("Best performing stock: ", Fore.BLUE + self.get_best_stock().symbol, ", ", Fore.GREEN + str(self.get_best_stock(
-        ).percent_change) + Style.RESET_ALL, "%, $", Fore.GREEN + str(self.get_best_stock().get_value()) + Style.RESET_ALL)
-        print("Worst performing stock: ", Fore.RED + self.get_worst_stock().symbol, ", ", Fore.RED + str(self.get_worst_stock(
-        ).percent_change) + Style.RESET_ALL, "%, $", Fore.RED + str(self.get_worst_stock().get_value()) + Style.RESET_ALL)
+        print("Cash: $" + (Fore.GREEN + str(self.cash) + Style.RESET_ALL))
+        print("Portfolio Value: $" + Fore.GREEN +
+              str(current_portfolio_value + self.cash) + Style.RESET_ALL)
+        print("Portfolio Change: " + (Fore.GREEN if percent_change > 0 else Fore.RED) +
+              str(percent_change) + "%" + Style.RESET_ALL + "%")
+        print("Best performing stock: " + Fore.BLUE + self.get_best_stock().symbol + ", " + Fore.GREEN + str(self.get_best_stock(
+        ).percent_change) + Style.RESET_ALL + "%, $" + Fore.GREEN + str(self.get_best_stock().get_value()) + Style.RESET_ALL)
+        print("Worst performing stock: " + Fore.RED + self.get_worst_stock().symbol + ", " + Fore.RED + str(self.get_worst_stock(
+        ).percent_change) + Style.RESET_ALL + "%, $" + Fore.RED + str(self.get_worst_stock().get_value()) + Style.RESET_ALL)
         print("\n")
+        print("SYM\t SHRS\t \t\tPRICE \t\t\tVALUE \t\t\tCHANGE INITIAL")
+        print("-------------------------------------------------------------------------------------------------------")
         for stock in self.stocks:
             self.stocks[stock].print_stock()
-        print("----------------------------------------------------------------------\n")
+        print("-------------------------------------------------------------------------------------------------------\n")
 
 
 class Stock:
@@ -236,5 +256,5 @@ class Stock:
             (self.price - self.original_price) / self.original_price) * 100
 
     def print_stock(self):
-        print(self.symbol, ": ", str(self.shares), "\t$", str(self.price), "\t$", Fore.BLUE + str(self.get_value()
-                                                                                                  ) + Style.RESET_ALL, "\t", Fore.GREEN + str(self.percent_change) + Style.RESET_ALL, "%")
+        print(self.symbol + ":\t" + str(self.shares) + "\t$" + str(self.price) + "\t$" + Fore.BLUE + str(self.get_value())
+              + Style.RESET_ALL + "\t" + Fore.GREEN + f"{self.percent_change:.2f}" + Style.RESET_ALL + "%")
